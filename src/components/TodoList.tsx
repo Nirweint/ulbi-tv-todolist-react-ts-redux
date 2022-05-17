@@ -1,17 +1,27 @@
-import React, {useEffect} from 'react';
+import {useEffect} from 'react';
 import {useTypedSelector} from "../hooks/useTypedSelector";
 import {useActions} from "../hooks/useActions";
-import {fetchTodosAC} from "../store/action-creators/todo";
+import doc, { addPage, savePDF } from '../pdfCreator';
 
 export const TodoList: React.FC = () => {
     const {todos, error, limit, loading, page} = useTypedSelector(state => state.todo)
-    const {fetchTodosAC, setTodoPageAC} = useActions()
+    const { isCreatePDF } = useTypedSelector(state => state.app)
+    const {fetchTodosAC, setTodoPageAC, setIsCreatePDFAC} = useActions()
+   
 
     const pages = [1, 2, 3, 4, 5]
 
     useEffect(() => {
         fetchTodosAC(page, limit)
     }, [page])
+
+    useEffect(() => {
+        if (isCreatePDF) {
+            addPage()
+            doc.text('Hello from TodoList', 10, 20)
+            savePDF()
+        }
+    }, [isCreatePDF])
 
     if (loading) {
         return <h1>Loading in progress...</h1>
